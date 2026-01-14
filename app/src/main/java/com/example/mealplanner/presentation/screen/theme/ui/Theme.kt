@@ -1,4 +1,4 @@
-package com.example.mealplanner.presentation.theme.ui
+package com.example.mealplanner.presentation.screen.theme.ui
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

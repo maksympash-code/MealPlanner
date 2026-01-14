@@ -1,4 +1,4 @@
-package com.example.mealplanner.presentation.theme.ui
+package com.example.mealplanner.presentation.screen.theme.ui
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
