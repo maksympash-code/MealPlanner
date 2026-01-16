@@ -1,5 +1,7 @@
 package com.example.mealplanner.presentation.screen.search.components
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
@@ -11,23 +13,43 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.mealplanner.domain.models.Recipe
 import com.example.mealplanner.presentation.screen.theme.ui.MealPlannerTheme
 
 @Composable
-fun RecipeCard(modifier: Modifier = Modifier) {
+fun RecipeCard(
+    recipe: Recipe,
+    onClickRecipe: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
+        onClick = onClickRecipe,
         modifier = modifier
     ) {
-        Text(
-            text = "Some Text",
+        Row(
+            horizontalArrangement = Arrangement.SpaceAround,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            textAlign = TextAlign.Center
-        )
+        ) {
+            Text(
+                text = recipe.title,
+                maxLines = 3,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .weight(2f)
+            )
+            Text(
+                text = "${recipe.id}",
+                maxLines = 1,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .weight(1f)
+            )
+        }
+
     }
 }
 
@@ -35,6 +57,9 @@ fun RecipeCard(modifier: Modifier = Modifier) {
 @Composable
 fun RecipeCardPreview() {
     MealPlannerTheme {
-        RecipeCard()
+        RecipeCard(
+            Recipe(1111, "bread", "wdqwfq", null, null),
+            {}
+        )
     }
 }

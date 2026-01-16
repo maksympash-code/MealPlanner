@@ -8,10 +8,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.mealplanner.domain.models.Recipe
 import com.example.mealplanner.presentation.screen.theme.ui.MealPlannerTheme
 
 @Composable
 fun RecipeCardList(
+    recipes: List<Recipe>,
+    onClickRecipe: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -19,8 +22,13 @@ fun RecipeCardList(
         contentPadding = PaddingValues(vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        items(5) {
-            RecipeCard(modifier = Modifier.fillMaxWidth())
+        items(recipes.size) {
+            val recipe = recipes[it]
+            RecipeCard(
+                recipe = recipe,
+                onClickRecipe = { onClickRecipe(recipe.id) },
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
@@ -29,6 +37,12 @@ fun RecipeCardList(
 @Composable
 fun RecipeCardListPreview() {
     MealPlannerTheme {
-        RecipeCardList()
+        RecipeCardList(
+            listOf(
+                Recipe(1111, "bread", "wdqwfq", null, null),
+                Recipe(1112, "milk", "wdqwfq", null, null)
+            ),
+            {}
+        )
     }
 }
