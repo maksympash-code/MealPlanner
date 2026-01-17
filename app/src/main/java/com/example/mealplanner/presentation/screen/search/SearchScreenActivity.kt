@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import com.example.mealplanner.presentation.screen.MealPlannerApp
 import com.example.mealplanner.presentation.screen.theme.ui.MealPlannerTheme
 
 
@@ -13,7 +14,7 @@ class SearchScreenActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MealPlannerTheme {
-                SearchScreen()
+                MealPlannerApp()
             }
         }
     }

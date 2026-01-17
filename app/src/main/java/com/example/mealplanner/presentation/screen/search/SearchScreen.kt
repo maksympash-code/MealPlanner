@@ -15,6 +15,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mealplanner.data.remote.RetrofitServiceApiFactory
@@ -30,7 +31,9 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun SearchScreen() {
+fun SearchScreen(
+    onRecipeClick: (Int) -> Unit
+) {
     var selectedTab by rememberSaveable { mutableStateOf(BottomTab.SEARCH) }
     var query by rememberSaveable { mutableStateOf("") }
 
@@ -79,7 +82,7 @@ fun SearchScreen() {
                     )
                     RecipeCardList(
                         recipes = recipes,
-                        onClickRecipe = {},
+                        onClickRecipe = onRecipeClick,
                         Modifier
                             .weight(1f)
                             .fillMaxWidth()
@@ -100,6 +103,8 @@ fun SearchScreen() {
 @Composable
 fun SearchScreenPreview(){
     MealPlannerTheme {
-        SearchScreen()
+        SearchScreen(
+            {}
+        )
     }
 }
