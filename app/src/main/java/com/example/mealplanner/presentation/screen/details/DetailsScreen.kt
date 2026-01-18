@@ -2,25 +2,35 @@ package com.example.mealplanner.presentation.screen.details
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.mealplanner.data.local.MealPlannerDataBase
 import com.example.mealplanner.data.remote.RetrofitServiceApiFactory
+import com.example.mealplanner.data.repository.FavouritesRepositoryImpl
 import com.example.mealplanner.data.repository.RecipesRepositoryImpl
 import com.example.mealplanner.domain.models.RecipeDetails
 import com.example.mealplanner.presentation.screen.details.components.DetailsTopBar
+import kotlinx.coroutines.launch
 
 @Composable
 fun DetailsScreen(
@@ -33,6 +43,17 @@ fun DetailsScreen(
 
     val api = remember { RetrofitServiceApiFactory.create() }
     val repo = remember { RecipesRepositoryImpl(api) }
+
+    val context = LocalContext.current
+
+    val db = remember { MealPlannerDataBase.getDatabase(context) }
+    val favouritesRepo = remember { FavouritesRepositoryImpl(db.favouritesDao()) }
+
+    val favourites by favouritesRepo.getFavourites().collectAsState(initial = emptyList())
+
+    val isFavourite = favourites.any { it.id == recipeId }
+
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(recipeId) {
         isLoading = true
@@ -66,7 +87,28 @@ fun DetailsScreen(
                 }
 
                 else -> {
-                    Text(text = details!!.recipe.title)
+                    Row(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = details!!.recipe.title,
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        IconButton(
+                            onClick = {
+                                scope.launch {
+                                    if (isFavourite) favouritesRepo.removeFromFavourites(recipeId)
+                                    else favouritesRepo.addToFavourites(details!!.recipe)
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = if (isFavourite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                contentDescription = if (isFavourite) "Remove" else "Add"
+                            )
+                        }
+
+                    }
+
 
                     LazyColumn {
                         details?.ingredients?.let { ingredients ->
@@ -98,6 +140,4 @@ fun DetailsScreen(
             }
         }
     }
-
-
 }
