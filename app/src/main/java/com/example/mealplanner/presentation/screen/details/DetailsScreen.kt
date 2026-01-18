@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.example.mealplanner.data.remote.RetrofitServiceApiFactory
 import com.example.mealplanner.data.repository.RecipesRepositoryImpl
 import com.example.mealplanner.domain.models.RecipeDetails
-import com.example.mealplanner.presentation.screen.search.components.SearchTopBar
+import com.example.mealplanner.presentation.screen.details.components.DetailsTopBar
 
 @Composable
 fun DetailsScreen(
@@ -48,7 +48,9 @@ fun DetailsScreen(
     }
 
     Scaffold(
-        topBar = { SearchTopBar() }
+        topBar = { DetailsTopBar(
+            onClick = onBack
+        ) }
     ) {
         Column(modifier = Modifier.padding(it)) {
 
