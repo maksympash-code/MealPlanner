@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    kotlin("kapt")
 }
 
 android {
@@ -44,6 +45,9 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:3.0.0")
     implementation("com.squareup.retrofit2:converter-gson:3.0.0")
     implementation("androidx.navigation:navigation-compose:2.9.6")
+    implementation("androidx.room:room-runtime:2.8.4")
+    kapt("androidx.room:room-compiler:2.8.4")
+    implementation("androidx.room:room-ktx:2.8.4")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
