@@ -1,6 +1,6 @@
 package com.example.mealplanner.data.repository
 
-import com.example.mealplanner.data.local.FavouritesDao
+import com.example.mealplanner.data.local.favourites.FavouritesDao
 import com.example.mealplanner.data.mappers.toDataFavouriteEntity
 import com.example.mealplanner.data.mappers.toDomainRecipe
 import com.example.mealplanner.domain.models.Recipe

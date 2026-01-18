@@ -1,4 +1,4 @@
-package com.example.mealplanner.data.local
+package com.example.mealplanner.data.local.favourites
 
 import androidx.room.Dao
 import androidx.room.Insert

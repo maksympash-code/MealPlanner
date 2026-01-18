@@ -1,6 +1,6 @@
 package com.example.mealplanner.data.mappers
 
-import com.example.mealplanner.data.local.FavouriteRecipeEntity
+import com.example.mealplanner.data.local.favourites.FavouriteRecipeEntity
 import com.example.mealplanner.domain.models.Recipe
 
 fun FavouriteRecipeEntity.toDomainRecipe(): Recipe = Recipe(
