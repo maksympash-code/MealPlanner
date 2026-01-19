@@ -5,10 +5,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -23,13 +23,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mealplanner.data.local.MealPlannerDataBase
 import com.example.mealplanner.data.remote.RetrofitServiceApiFactory
 import com.example.mealplanner.data.repository.FavouritesRepositoryImpl
 import com.example.mealplanner.data.repository.RecipesRepositoryImpl
+import com.example.mealplanner.data.repository.ShoppingItemRepositoryImpl
 import com.example.mealplanner.domain.models.RecipeDetails
 import com.example.mealplanner.presentation.screen.details.components.DetailsTopBar
+import com.example.mealplanner.presentation.screen.theme.ui.MealPlannerTheme
 import kotlinx.coroutines.launch
 
 @Composable
@@ -53,6 +56,8 @@ fun DetailsScreen(
 
     val isFavourite = favourites.any { it.id == recipeId }
 
+    val shoppingRepo = remember { ShoppingItemRepositoryImpl(db) }
+
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(recipeId) {
@@ -71,7 +76,31 @@ fun DetailsScreen(
     Scaffold(
         topBar = { DetailsTopBar(
             onClick = onBack
-        ) }
+        ) },
+
+        floatingActionButton = {
+            if (details != null) {
+                FloatingActionButton(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                shoppingRepo.addIngredients(details!!.ingredients)
+                            } catch (e: Exception) {
+                                error = e.message
+                            }
+
+                        }
+
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AddCircle,
+                        contentDescription = "Add ingredients"
+                    )
+                }
+            }
+
+        }
     ) {
         Column(modifier = Modifier.padding(it)) {
 
@@ -139,5 +168,17 @@ fun DetailsScreen(
                 }
             }
         }
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun DetailsScreenPreview() {
+    MealPlannerTheme {
+        DetailsScreen(
+            recipeId = 1111,
+            onBack = {}
+        )
     }
 }
