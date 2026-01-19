@@ -24,6 +24,7 @@ import com.example.mealplanner.data.local.MealPlannerDataBase
 import com.example.mealplanner.data.remote.RetrofitServiceApiFactory
 import com.example.mealplanner.data.repository.FavouritesRepositoryImpl
 import com.example.mealplanner.data.repository.RecipesRepositoryImpl
+import com.example.mealplanner.data.repository.ShoppingItemRepositoryImpl
 import com.example.mealplanner.domain.models.Recipe
 import com.example.mealplanner.presentation.screen.search.components.SearchBottomBar
 import com.example.mealplanner.presentation.screen.search.components.RecipeCardList
@@ -35,7 +36,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SearchScreen(
-    onRecipeClick: (Int) -> Unit
+    onRecipeClick: (Int) -> Unit,
+    onShoppingClick: () -> Unit
 ) {
     var selectedTab by rememberSaveable { mutableStateOf(BottomTab.SEARCH) }
     var query by rememberSaveable { mutableStateOf("") }
@@ -61,7 +63,10 @@ fun SearchScreen(
         bottomBar = {
             SearchBottomBar(
                 selectedTab = selectedTab,
-                onTabSelected = { selectedTab = it }
+                onTabSelected = { tab ->
+                    if (tab == BottomTab.SHOPPING) onShoppingClick()
+                    else selectedTab = tab
+                }
             )
         }
     ) { innerPadding ->
@@ -112,6 +117,8 @@ fun SearchScreen(
                         )
                     }
                 }
+
+                else -> {}
             }
         }
     }
@@ -123,6 +130,7 @@ fun SearchScreen(
 fun SearchScreenPreview(){
     MealPlannerTheme {
         SearchScreen(
+            {},
             {}
         )
     }

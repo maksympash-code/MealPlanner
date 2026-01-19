@@ -16,6 +16,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.example.mealplanner.data.local.MealPlannerDataBase
 import com.example.mealplanner.data.repository.ShoppingItemRepositoryImpl
 import com.example.mealplanner.presentation.screen.shoppinglist.components.ShoppingItemCard
@@ -64,7 +65,8 @@ fun ShoppingListScreen(
                         scope.launch {
                             repo.toggleChecked(ingredient.id)
                         }
-                    }
+                    },
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
                 )
             }
         }

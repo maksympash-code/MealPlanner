@@ -1,6 +1,8 @@
 package com.example.mealplanner.presentation.screen.search.components
 
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
@@ -37,6 +39,17 @@ fun SearchBottomBar(
             onClick = { onTabSelected(BottomTab.FAVOURITES) },
             icon = { Icon(Icons.Filled.FavoriteBorder, contentDescription = "Favourite") },
             label = { Text("Favourite") }
+        )
+
+        NavigationBarItem(
+            selected = selectedTab == BottomTab.SHOPPING,
+            onClick = { onTabSelected(BottomTab.SHOPPING) },
+            icon = {
+                Icon(
+                    Icons.Default.ShoppingCart,
+                "Shopping"
+            )},
+            label = { Text("Shopping Items") }
         )
 
     }
