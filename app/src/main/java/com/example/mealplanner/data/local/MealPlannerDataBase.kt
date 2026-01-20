@@ -11,7 +11,7 @@ import com.example.mealplanner.data.local.shoplist.ShoppingItemEntity
 
 @Database(
     entities = [FavouriteRecipeEntity::class, ShoppingItemEntity::class],
-    version = 2
+    version = 3
 )
 abstract class MealPlannerDataBase: RoomDatabase() {
     abstract fun favouritesDao(): FavouritesDao

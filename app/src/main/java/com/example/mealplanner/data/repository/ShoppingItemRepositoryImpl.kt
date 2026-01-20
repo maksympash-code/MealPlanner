@@ -20,7 +20,7 @@ class ShoppingItemRepositoryImpl(
     }
 
     override suspend fun addItem(item: ShoppingItem) {
-        db.shopItemDao().insertItem(item.toDataShoppingItem())
+        db.shopItemDao().upsetMerge(listOf(item.toDataShoppingItem()))
     }
 
     override suspend fun addIngredients(ingredients: List<Ingredient>) {
@@ -31,7 +31,7 @@ class ShoppingItemRepositoryImpl(
                 first.copy(amount = group.sumOf { it.amount })
             }
 
-        db.shopItemDao().insertAll(merged.map { it.toShoppingItemEntity() })
+        db.shopItemDao().upsetMerge(merged.map { it.toShoppingItemEntity() })
     }
 
     override suspend fun toggleChecked(itemId: Int) {

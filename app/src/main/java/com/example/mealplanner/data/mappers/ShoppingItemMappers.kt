@@ -12,17 +12,25 @@ fun ShoppingItemEntity.toDomainShoppingItem(): ShoppingItem = ShoppingItem(
     checked = checked
 )
 
-fun ShoppingItem.toDataShoppingItem(): ShoppingItemEntity = ShoppingItemEntity(
-    id = id,
-    name = name,
-    amount = amount,
-    unit = unit,
-    checked = checked
-)
+fun ShoppingItem.toDataShoppingItem(): ShoppingItemEntity {
+    val cleanName = name.trim()
+    return ShoppingItemEntity(
+        id = id,
+        name = cleanName,
+        amount = amount,
+        unit = unit,
+        checked = checked,
+        nameKey = cleanName.lowercase()
+    )
+}
 
-fun Ingredient.toShoppingItemEntity(): ShoppingItemEntity = ShoppingItemEntity(
-    name = name,
-    amount = amount,
-    unit = unit,
-    checked = false
-)
+fun Ingredient.toShoppingItemEntity(): ShoppingItemEntity {
+    val cleanName = name.trim()
+    return ShoppingItemEntity(
+        name = cleanName,
+        amount = amount,
+        unit = unit,
+        checked = false,
+        nameKey = cleanName.lowercase()
+    )
+}
