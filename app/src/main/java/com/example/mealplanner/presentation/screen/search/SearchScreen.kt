@@ -36,37 +36,20 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SearchScreen(
+    state: SearchUiState,
+    favourites: List<Recipe>,
     onRecipeClick: (Int) -> Unit,
-    onShoppingClick: () -> Unit
+    onShoppingClick: () -> Unit,
+    onQueryChanged: (String) -> Unit,
+    onSearchClick: () -> Unit,
+    onTabSelected: (BottomTab) -> Unit
 ) {
-    var selectedTab by rememberSaveable { mutableStateOf(BottomTab.SEARCH) }
-    var query by rememberSaveable { mutableStateOf("") }
-
-    var isLoading by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) }
-    var recipes by remember { mutableStateOf<List<Recipe>>(emptyList()) }
-
-    val api = remember { RetrofitServiceApiFactory.create() }
-    val repo = remember { RecipesRepositoryImpl(api) }
-
-    val context = LocalContext.current
-
-    val db = remember { MealPlannerDataBase.getDatabase(context) }
-    val favouritesRepo = remember { FavouritesRepositoryImpl(db.favouritesDao()) }
-
-    val favourites by favouritesRepo.getFavourites().collectAsState(initial = emptyList())
-
-    val scope = rememberCoroutineScope()
-
     Scaffold(
         topBar = { SearchTopBar() },
         bottomBar = {
             SearchBottomBar(
-                selectedTab = selectedTab,
-                onTabSelected = { tab ->
-                    if (tab == BottomTab.SHOPPING) onShoppingClick()
-                    else selectedTab = tab
-                }
+                selectedTab = state.selectedTab,
+                onTabSelected = { tab -> onTabSelected(tab)}
             )
         }
     ) { innerPadding ->
@@ -75,28 +58,22 @@ fun SearchScreen(
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            when (selectedTab) {
+            when (state.selectedTab) {
                 BottomTab.SEARCH -> {
                     SearchRow(
-                        query = query,
-                        onQueryChange = { query = it },
-                        onSearchClick = {
-                            scope.launch {
-                                isLoading = true
-                                error = null
-                                try {
-                                    recipes = repo.searchRecipes(query.trim())
-                                } catch (e: Exception) {
-                                    error = e.message ?: "Unknown error"
-                                } finally {
-                                    isLoading = false
-                                }
-                            }
-
-                        }
+                        query = state.query,
+                        onQueryChange = onQueryChanged,
+                        onSearchClick = onSearchClick
                     )
+
+                    if (state.isLoading) {
+                        Text("Loading...", modifier = Modifier.padding(16.dp))
+                    } else if (state.error != null) {
+                        Text("Error: ${state.error}", modifier = Modifier.padding(16.dp))
+                    }
+
                     RecipeCardList(
-                        recipes = recipes,
+                        recipes = state.recipes,
                         onClickRecipe = onRecipeClick,
                         Modifier
                             .weight(1f)
@@ -118,7 +95,7 @@ fun SearchScreen(
                     }
                 }
 
-                else -> {}
+                BottomTab.SHOPPING -> {}
             }
         }
     }
@@ -130,6 +107,11 @@ fun SearchScreen(
 fun SearchScreenPreview(){
     MealPlannerTheme {
         SearchScreen(
+            SearchUiState(),
+            emptyList(),
+            {},
+            {},
+            {},
             {},
             {}
         )

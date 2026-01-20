@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.mealplanner.presentation.screen.details.DetailsScreen
+import com.example.mealplanner.presentation.screen.search.SearchRoute
 import com.example.mealplanner.presentation.screen.search.SearchScreen
 import com.example.mealplanner.presentation.screen.shoppinglist.ShoppingListScreen
 
@@ -20,7 +21,7 @@ fun MealPlannerApp() {
     ) {
 
         composable(Routes.SEARCH) {
-            SearchScreen(
+            SearchRoute (
                 onRecipeClick = { id ->
                     navController.navigate(Routes.details(id))
                 },
