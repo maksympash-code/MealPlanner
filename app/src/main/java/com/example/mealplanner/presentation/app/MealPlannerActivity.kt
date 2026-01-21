@@ -1,20 +1,20 @@
-package com.example.mealplanner.presentation.screen.search
+package com.example.mealplanner.presentation.app
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.example.mealplanner.presentation.screen.MealPlannerApp
 import com.example.mealplanner.presentation.screen.theme.ui.MealPlannerTheme
 
+class MealPlannerActivity : ComponentActivity() {
+    val container by lazy { AppContainer(applicationContext) }
 
-class SearchScreenActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             MealPlannerTheme {
-                MealPlannerApp()
+                MealPlannerApp(container)
             }
         }
     }

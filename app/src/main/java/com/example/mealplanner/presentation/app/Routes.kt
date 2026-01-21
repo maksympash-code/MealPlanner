@@ -1,4 +1,4 @@
-package com.example.mealplanner.presentation.screen
+package com.example.mealplanner.presentation.app
 
 object Routes {
     const val SEARCH = "search"

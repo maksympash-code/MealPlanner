@@ -17,61 +17,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.mealplanner.data.local.MealPlannerDataBase
-import com.example.mealplanner.data.remote.RetrofitServiceApiFactory
-import com.example.mealplanner.data.repository.FavouritesRepositoryImpl
-import com.example.mealplanner.data.repository.RecipesRepositoryImpl
-import com.example.mealplanner.data.repository.ShoppingItemRepositoryImpl
-import com.example.mealplanner.domain.models.RecipeDetails
 import com.example.mealplanner.presentation.screen.details.components.DetailsTopBar
-import com.example.mealplanner.presentation.screen.theme.ui.MealPlannerTheme
-import kotlinx.coroutines.launch
 
 @Composable
 fun DetailsScreen(
     recipeId: Int,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    viewModel: DetailsViewModel
 ) {
-    var isLoading by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) }
-    var details by remember { mutableStateOf<RecipeDetails?>(null) }
 
-    val api = remember { RetrofitServiceApiFactory.create() }
-    val repo = remember { RecipesRepositoryImpl(api) }
-
-    val context = LocalContext.current
-
-    val db = remember { MealPlannerDataBase.getDatabase(context) }
-    val favouritesRepo = remember { FavouritesRepositoryImpl(db.favouritesDao()) }
-
-    val favourites by favouritesRepo.getFavourites().collectAsState(initial = emptyList())
-
-    val isFavourite = favourites.any { it.id == recipeId }
-
-    val shoppingRepo = remember { ShoppingItemRepositoryImpl(db) }
-
-    val scope = rememberCoroutineScope()
-
-    LaunchedEffect(recipeId) {
-        isLoading = true
-        error = null
-        details = null
-        try {
-            details = repo.getRecipeDetails(recipeId)
-        } catch (e: Exception) {
-            error = e.message ?: "Unknown error."
-        } finally {
-            isLoading = false
-        }
-    }
+    val state by viewModel.uiState.collectAsState()
+    LaunchedEffect(recipeId) { viewModel.load(recipeId) }
 
     Scaffold(
         topBar = { DetailsTopBar(
@@ -79,19 +37,9 @@ fun DetailsScreen(
         ) },
 
         floatingActionButton = {
-            if (details != null) {
+            if (state.details != null) {
                 FloatingActionButton(
-                    onClick = {
-                        scope.launch {
-                            try {
-                                shoppingRepo.addIngredients(details!!.ingredients)
-                            } catch (e: Exception) {
-                                error = e.message
-                            }
-
-                        }
-
-                    }
+                    onClick = viewModel::onAddIngredientsClick
                 ) {
                     Icon(
                         imageVector = Icons.Default.AddCircle,
@@ -105,34 +53,29 @@ fun DetailsScreen(
         Column(modifier = Modifier.padding(it)) {
 
             when {
-                isLoading -> Text("Loading...", modifier = Modifier.padding(16.dp))
+                state.isLoading -> Text("Loading...", modifier = Modifier.padding(16.dp))
 
-                error != null -> {
-                    Text("Error: $error", modifier = Modifier.padding(16.dp))
+                state.error != null -> {
+                    Text("Error: ${state.error}", modifier = Modifier.padding(16.dp))
                 }
 
-                details == null -> {
+                state.details == null -> {
                     Text("No data", modifier = Modifier.padding(16.dp))
                 }
 
                 else -> {
                     Row(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = details!!.recipe.title,
+                            text = state.details!!.recipe.title,
                             modifier = Modifier.weight(1f)
                         )
 
                         IconButton(
-                            onClick = {
-                                scope.launch {
-                                    if (isFavourite) favouritesRepo.removeFromFavourites(recipeId)
-                                    else favouritesRepo.addToFavourites(details!!.recipe)
-                                }
-                            }
+                            onClick = viewModel::onToggleFavouriteClick
                         ) {
                             Icon(
-                                imageVector = if (isFavourite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                                contentDescription = if (isFavourite) "Remove" else "Add"
+                                imageVector = if (state.isFavourite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                contentDescription = if (state.isFavourite) "Remove" else "Add"
                             )
                         }
 
@@ -140,7 +83,7 @@ fun DetailsScreen(
 
 
                     LazyColumn {
-                        details?.ingredients?.let { ingredients ->
+                        state.details?.ingredients?.let { ingredients ->
                             items(
                                 ingredients.size,
                             ) {index ->
@@ -172,13 +115,13 @@ fun DetailsScreen(
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun DetailsScreenPreview() {
-    MealPlannerTheme {
-        DetailsScreen(
-            recipeId = 1111,
-            onBack = {}
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun DetailsScreenPreview() {
+//    MealPlannerTheme {
+//        DetailsScreen(
+//            recipeId = 1111,
+//            onBack = {},
+//        )
+//    }
+//}

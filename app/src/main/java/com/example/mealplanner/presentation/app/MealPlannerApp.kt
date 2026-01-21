@@ -1,18 +1,20 @@
-package com.example.mealplanner.presentation.screen
+package com.example.mealplanner.presentation.app
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.mealplanner.presentation.screen.details.DetailsScreen
+import com.example.mealplanner.presentation.screen.details.DetailsViewModel
+import com.example.mealplanner.presentation.screen.details.DetailsViewModelFactory
 import com.example.mealplanner.presentation.screen.search.SearchRoute
-import com.example.mealplanner.presentation.screen.search.SearchScreen
 import com.example.mealplanner.presentation.screen.shoppinglist.ShoppingListScreen
 
 @Composable
-fun MealPlannerApp() {
+fun MealPlannerApp(container: AppContainer) {
     val navController = rememberNavController()
 
     NavHost(
@@ -35,9 +37,18 @@ fun MealPlannerApp() {
         ) {backStackEntry ->
             val id = backStackEntry.arguments?.getInt("id") ?: 0
 
+            val vm: DetailsViewModel = viewModel(
+                factory = DetailsViewModelFactory(
+                    recipesRepo = container.recipesRepo,
+                    favouritesRepo = container.favouritesRepo,
+                    shoppingRepo =  container.shoppingRepo
+                )
+            )
+
             DetailsScreen(
                 recipeId = id,
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                viewModel = vm
             )
         }
 
