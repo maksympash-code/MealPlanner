@@ -26,25 +26,16 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ShoppingListScreen(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    state: ShoppingUiState,
+    onClearCheckedClick: () -> Unit,
+    onToggleCheckedClick: (Int) -> Unit
 ) {
-
-    val context = LocalContext.current
-    val db = remember { MealPlannerDataBase.getDatabase(context) }
-    val repo = remember { ShoppingItemRepositoryImpl(db) }
-    val items by repo.getShoppingList().collectAsState(initial = emptyList())
-
-    val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = { ShoppingListTopBar(onBack) },
         floatingActionButton = {
-            FloatingActionButton(
-                    onClick = {scope.launch {
-                        repo.clearChecked()
-                    }
-                }
-            ) {
+            FloatingActionButton(onClick = onClearCheckedClick) {
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = "Clear all checked"
@@ -56,16 +47,12 @@ fun ShoppingListScreen(
             modifier = Modifier.padding(it)
         ) {
             items(
-                items = items,
+                items = state.items,
                 key = { it.id }
             ) { ingredient ->
                 ShoppingItemCard(
                     ingredient = ingredient,
-                    onToggleChecked = {
-                        scope.launch {
-                            repo.toggleChecked(ingredient.id)
-                        }
-                    },
+                    onToggleChecked = { onToggleCheckedClick(ingredient.id) },
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
                 )
             }
@@ -73,12 +60,12 @@ fun ShoppingListScreen(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun ShoppingListScreenPreview(){
-    MealPlannerTheme {
-        ShoppingListScreen(
-            {}
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun ShoppingListScreenPreview(){
+//    MealPlannerTheme {
+//        ShoppingListScreen(
+//            {}
+//        )
+//    }
+//}

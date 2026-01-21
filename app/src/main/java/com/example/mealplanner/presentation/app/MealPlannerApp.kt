@@ -1,6 +1,8 @@
 package com.example.mealplanner.presentation.app
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -12,6 +14,8 @@ import com.example.mealplanner.presentation.screen.details.DetailsViewModel
 import com.example.mealplanner.presentation.screen.details.DetailsViewModelFactory
 import com.example.mealplanner.presentation.screen.search.SearchRoute
 import com.example.mealplanner.presentation.screen.shoppinglist.ShoppingListScreen
+import com.example.mealplanner.presentation.screen.shoppinglist.ShoppingViewModel
+import com.example.mealplanner.presentation.screen.shoppinglist.ShoppingViewModelFactory
 
 @Composable
 fun MealPlannerApp(container: AppContainer) {
@@ -55,8 +59,15 @@ fun MealPlannerApp(container: AppContainer) {
         composable(
             route = Routes.SHOPPING
         ) {
+            val vm: ShoppingViewModel = viewModel(factory = ShoppingViewModelFactory(container.shoppingRepo))
+
+            val state by vm.uiState.collectAsState()
+
             ShoppingListScreen(
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                state = state,
+                onClearCheckedClick = vm::onClearCheckedClick,
+                onToggleCheckedClick = vm::onToggleCheckedClick
             )
         }
     }
