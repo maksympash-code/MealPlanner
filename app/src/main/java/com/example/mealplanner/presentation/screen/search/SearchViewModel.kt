@@ -6,14 +6,17 @@ import com.example.mealplanner.domain.models.Recipe
 import com.example.mealplanner.domain.repositories.FavouritesRepository
 import com.example.mealplanner.domain.repositories.RecipesRepository
 import com.example.mealplanner.presentation.screen.search.model.BottomTab
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SearchViewModel (
+@HiltViewModel
+class SearchViewModel @Inject constructor(
     private val recipesRepo: RecipesRepository,
     private val favouritesRepo: FavouritesRepository
 ) : ViewModel() {

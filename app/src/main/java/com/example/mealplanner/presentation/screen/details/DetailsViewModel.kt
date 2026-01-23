@@ -5,13 +5,16 @@ import androidx.lifecycle.viewModelScope
 import com.example.mealplanner.domain.repositories.FavouritesRepository
 import com.example.mealplanner.domain.repositories.RecipesRepository
 import com.example.mealplanner.domain.repositories.ShoppingRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class DetailsViewModel(
+@HiltViewModel
+class DetailsViewModel @Inject constructor(
     private val recipesRepo: RecipesRepository,
     private val favouritesRepo: FavouritesRepository,
     private val shoppingRepo: ShoppingRepository

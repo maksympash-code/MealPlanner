@@ -1,6 +1,6 @@
 package com.example.mealplanner.data.repository
 
-import com.example.mealplanner.data.local.MealPlannerDataBase
+import com.example.mealplanner.data.local.shoplist.ShopItemDao
 import com.example.mealplanner.data.mappers.toDataShoppingItem
 import com.example.mealplanner.data.mappers.toDomainShoppingItem
 import com.example.mealplanner.data.mappers.toShoppingItemEntity
@@ -9,18 +9,19 @@ import com.example.mealplanner.domain.models.ShoppingItem
 import com.example.mealplanner.domain.repositories.ShoppingRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class ShoppingItemRepositoryImpl(
-    private val db: MealPlannerDataBase
+class ShoppingItemRepositoryImpl @Inject constructor(
+    private val dao: ShopItemDao
 ): ShoppingRepository {
     override fun getShoppingList(): Flow<List<ShoppingItem>> {
-        return db.shopItemDao().observeShopping().map {
+        return dao.observeShopping().map {
             entities -> entities.map { it.toDomainShoppingItem() }
         }
     }
 
     override suspend fun addItem(item: ShoppingItem) {
-        db.shopItemDao().upsetMerge(listOf(item.toDataShoppingItem()))
+        dao.upsetMerge(listOf(item.toDataShoppingItem()))
     }
 
     override suspend fun addIngredients(ingredients: List<Ingredient>) {
@@ -31,18 +32,18 @@ class ShoppingItemRepositoryImpl(
                 first.copy(amount = group.sumOf { it.amount })
             }
 
-        db.shopItemDao().upsetMerge(merged.map { it.toShoppingItemEntity() })
+        dao.upsetMerge(merged.map { it.toShoppingItemEntity() })
     }
 
     override suspend fun toggleChecked(itemId: Int) {
-        db.shopItemDao().toggleChecked(itemId)
+        dao.toggleChecked(itemId)
     }
 
     override suspend fun deleteItem(itemId: Int) {
-        db.shopItemDao().deleteItem(itemId)
+        dao.deleteItem(itemId)
     }
 
     override suspend fun clearChecked() {
-       db.shopItemDao().clearChecked()
+       dao.clearChecked()
     }
 }

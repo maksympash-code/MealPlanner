@@ -7,8 +7,9 @@ import com.example.mealplanner.domain.models.Recipe
 import com.example.mealplanner.domain.repositories.FavouritesRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class FavouritesRepositoryImpl(
+class FavouritesRepositoryImpl @Inject constructor(
     private val dao: FavouritesDao,
 ): FavouritesRepository {
     override fun getFavourites(): Flow<List<Recipe>> {
