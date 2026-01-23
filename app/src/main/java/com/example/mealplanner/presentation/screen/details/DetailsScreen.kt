@@ -12,14 +12,18 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.mealplanner.presentation.screen.details.components.DetailsTopBar
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun DetailsScreen(
@@ -29,12 +33,25 @@ fun DetailsScreen(
 ) {
 
     val state by viewModel.uiState.collectAsState()
+    val snackBarHostState = remember { SnackbarHostState() }
+
     LaunchedEffect(recipeId) { viewModel.load(recipeId) }
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collectLatest {event ->
+            when (event) {
+                is DetailsUiEvent.ShowMessage -> {
+                    snackBarHostState.showSnackbar(event.text)
+                }
+            }
+        }
+    }
 
     Scaffold(
         topBar = { DetailsTopBar(
             onClick = onBack
         ) },
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
 
         floatingActionButton = {
             if (state.details != null) {

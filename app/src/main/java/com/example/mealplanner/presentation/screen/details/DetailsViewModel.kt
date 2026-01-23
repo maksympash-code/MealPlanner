@@ -7,7 +7,9 @@ import com.example.mealplanner.domain.repositories.RecipesRepository
 import com.example.mealplanner.domain.repositories.ShoppingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -22,6 +24,10 @@ class DetailsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(DetailsUiState())
     val uiState: StateFlow<DetailsUiState>
         get() = _uiState
+
+    private val _events = MutableSharedFlow<DetailsUiEvent>(extraBufferCapacity = 1)
+    val events: SharedFlow<DetailsUiEvent>
+        get() = _events
 
     private var currentRecipeId = 0
     private var favJob: Job? = null
@@ -58,12 +64,23 @@ class DetailsViewModel @Inject constructor(
     }
 
     fun onAddIngredientsClick() {
-        val details = _uiState.value.details ?: return
+        val details = _uiState.value.details
+        if (details == null){
+            _events.tryEmit(DetailsUiEvent.ShowMessage("Немає інгредієнтів для додавання"))
+            return
+        }
+
         viewModelScope.launch {
-            try {
+            runCatching {
                 shoppingRepo.addIngredients(details.ingredients)
-            } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message ?: "Failed to add ingredients") }
+            }.onSuccess {
+                _events.tryEmit(
+                    DetailsUiEvent.ShowMessage("Інгредієнти додано у Shopping ✅ (${details.ingredients.size})")
+                )
+            }.onFailure { e ->
+                _events.tryEmit(
+                    DetailsUiEvent.ShowMessage("Помилка додавання: ${e.message ?: "Unknown error"}")
+                )
             }
         }
     }
