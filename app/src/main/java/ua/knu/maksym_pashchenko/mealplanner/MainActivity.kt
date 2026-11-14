@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
             MealPlannerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
-                        name = "Android",
+                        name = "MealPlanner",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
