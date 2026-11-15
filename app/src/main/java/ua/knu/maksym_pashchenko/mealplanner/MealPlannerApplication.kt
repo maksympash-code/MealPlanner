@@ -1,0 +1,7 @@
+package ua.knu.maksym_pashchenko.mealplanner
+
+import android.app.Application
+import dagger.hilt.android.HiltAndroidApp
+
+@HiltAndroidApp
+class MealPlannerApplication : Application()
