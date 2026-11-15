@@ -6,8 +6,8 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.sharp.Home
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,7 +17,7 @@ fun NavigationBottomBar(
     currentRoute: String?,
     onNavigate: (String) -> Unit
 ) {
-    BottomAppBar {
+    NavigationBar {
         NavigationBarItem(
             selected = currentRoute == Routes.RECIPES,
             onClick = { onNavigate(Routes.RECIPES) },

@@ -18,7 +18,6 @@ import ua.knu.maksym_pashchenko.mealplanner.ui.screens.favourites.FavoritesScree
 import ua.knu.maksym_pashchenko.mealplanner.ui.screens.planner.PlanningScreen
 import ua.knu.maksym_pashchenko.mealplanner.ui.screens.recipes.RecipesScreen
 import ua.knu.maksym_pashchenko.mealplanner.ui.screens.shopping.ShoppingScreen
-import kotlin.collections.contains
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,15 +50,13 @@ fun AppNavGraph(
 
     Scaffold(
         topBar = {
-            if (currentRoute == Routes.RECIPES){
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = "Recipes"
-                        )
-                    }
-                )
-            }
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Meal Planner"
+                    )
+                }
+            )
         },
         bottomBar = {
             if (showBottomBar) {
