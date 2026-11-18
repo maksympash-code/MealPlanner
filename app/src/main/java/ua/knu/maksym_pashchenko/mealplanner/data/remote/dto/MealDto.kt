@@ -12,134 +12,134 @@ data class MealDto(
     val name: String,
 
     @SerialName("strCategory")
-    val category: String?,
+    val category: String? = null,
 
     @SerialName("strArea")
-    val area: String?,
+    val area: String? = null,
 
     @SerialName("strInstructions")
-    val instructions: String?,
+    val instructions: String? = null,
 
     @SerialName("strMealThumb")
-    val image: String?,
+    val image: String? = null,
 
     @SerialName("strIngredient1")
-    val firstIngredient: String?,
+    val firstIngredient: String? = null,
 
     @SerialName("strIngredient2")
-    val secondIngredient: String?,
+    val secondIngredient: String? = null,
 
     @SerialName("strIngredient3")
-    val thirdIngredient: String?,
+    val thirdIngredient: String? = null,
 
     @SerialName("strIngredient4")
-    val fourthIngredient: String?,
+    val fourthIngredient: String? = null,
 
     @SerialName("strIngredient5")
-    val fifthIngredient: String?,
+    val fifthIngredient: String? = null,
 
     @SerialName("strIngredient6")
-    val sixthIngredient: String?,
+    val sixthIngredient: String? = null,
 
     @SerialName("strIngredient7")
-    val seventhIngredient: String?,
+    val seventhIngredient: String? = null,
 
     @SerialName("strIngredient8")
-    val eighthIngredient: String?,
+    val eighthIngredient: String? = null,
 
     @SerialName("strIngredient9")
-    val ninthIngredient: String?,
+    val ninthIngredient: String? = null,
 
     @SerialName("strIngredient10")
-    val tenthIngredient: String?,
+    val tenthIngredient: String? = null,
 
     @SerialName("strIngredient11")
-    val eleventhIngredient: String?,
+    val eleventhIngredient: String? = null,
 
     @SerialName("strIngredient12")
-    val twelfthIngredient: String?,
+    val twelfthIngredient: String? = null,
 
     @SerialName("strIngredient13")
-    val thirteenthIngredient: String?,
+    val thirteenthIngredient: String? = null,
 
     @SerialName("strIngredient14")
-    val fourteenthIngredient: String?,
+    val fourteenthIngredient: String? = null,
 
     @SerialName("strIngredient15")
-    val fifteenthIngredient: String?,
+    val fifteenthIngredient: String? = null,
 
     @SerialName("strIngredient16")
-    val sixteenthIngredient: String?,
+    val sixteenthIngredient: String? = null,
 
     @SerialName("strIngredient17")
-    val seventeenthIngredient: String?,
+    val seventeenthIngredient: String? = null,
 
     @SerialName("strIngredient18")
-    val eighteenthIngredient: String?,
+    val eighteenthIngredient: String? = null,
 
     @SerialName("strIngredient19")
-    val nineteenthIngredient: String?,
+    val nineteenthIngredient: String? = null,
 
     @SerialName("strIngredient20")
-    val twentiethIngredient: String?,
+    val twentiethIngredient: String? = null,
 
     @SerialName("strMeasure1")
-    val firstMeasure: String?,
+    val firstMeasure: String? = null,
 
     @SerialName("strMeasure2")
-    val secondMeasure: String?,
+    val secondMeasure: String? = null,
 
     @SerialName("strMeasure3")
-    val thirdMeasure: String?,
+    val thirdMeasure: String? = null,
 
     @SerialName("strMeasure4")
-    val fourthMeasure: String?,
+    val fourthMeasure: String? = null,
 
     @SerialName("strMeasure5")
-    val fifthMeasure: String?,
+    val fifthMeasure: String? = null,
 
     @SerialName("strMeasure6")
-    val sixthMeasure: String?,
+    val sixthMeasure: String? = null,
 
     @SerialName("strMeasure7")
-    val seventhMeasure: String?,
+    val seventhMeasure: String? = null,
 
     @SerialName("strMeasure8")
-    val eighthMeasure: String?,
+    val eighthMeasure: String? = null,
 
     @SerialName("strMeasure9")
-    val ninthMeasure: String?,
+    val ninthMeasure: String? = null,
 
     @SerialName("strMeasure10")
-    val tenthMeasure: String?,
+    val tenthMeasure: String? = null,
 
     @SerialName("strMeasure11")
-    val eleventhMeasure: String?,
+    val eleventhMeasure: String? = null,
 
     @SerialName("strMeasure12")
-    val twelfthMeasure: String?,
+    val twelfthMeasure: String? = null,
 
     @SerialName("strMeasure13")
-    val thirteenthMeasure: String?,
+    val thirteenthMeasure: String? = null,
 
     @SerialName("strMeasure14")
-    val fourteenthMeasure: String?,
+    val fourteenthMeasure: String? = null,
 
     @SerialName("strMeasure15")
-    val fifteenthMeasure: String?,
+    val fifteenthMeasure: String? = null,
 
     @SerialName("strMeasure16")
-    val sixteenthMeasure: String?,
+    val sixteenthMeasure: String? = null,
 
     @SerialName("strMeasure17")
-    val seventeenthMeasure: String?,
+    val seventeenthMeasure: String? = null,
 
     @SerialName("strMeasure18")
-    val eighteenthMeasure: String?,
+    val eighteenthMeasure: String? = null,
 
     @SerialName("strMeasure19")
-    val nineteenthMeasure: String?,
+    val nineteenthMeasure: String? = null,
 
     @SerialName("strMeasure20")
-    val twentiethMeasure: String?,
+    val twentiethMeasure: String? = null,
 )
