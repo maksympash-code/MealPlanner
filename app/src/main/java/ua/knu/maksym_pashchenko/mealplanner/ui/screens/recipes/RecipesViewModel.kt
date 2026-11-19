@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ua.knu.maksym_pashchenko.mealplanner.domain.repository.RecipeRepository
+import ua.knu.maksym_pashchenko.mealplanner.ui.screens.recipes.state.RecipesResultState
+import ua.knu.maksym_pashchenko.mealplanner.ui.screens.recipes.state.RecipesUiState
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -32,25 +34,33 @@ class RecipesViewModel @Inject constructor(
             } else {
                 state.copy(
                     query = newQuery,
-                    recipes = emptyList(),
-                    isLoading = false,
-                    error = null,
-                    hasSearched = false
+                    resultState = RecipesResultState.Initial
                 )
             }
+        }
+    }
 
-
+    fun retrySearch() {
+        _uiState.update { state ->
+            if (
+                state.resultState is RecipesResultState.Error &&
+                state.query.isNotBlank()
+            ) {
+                state.copy(retryCount = state.retryCount + 1)
+            } else {
+                state
+            }
         }
     }
 
     private fun automaticRecipeSearch() {
         viewModelScope.launch {
             _uiState.map { state ->
-                state.query
+                state.query to state.retryCount
             }
                 .distinctUntilChanged()
-                .collectLatest { query ->
-                    val trimmedQuery = query.trim()
+                .collectLatest { pairOfState ->
+                    val trimmedQuery = pairOfState.first.trim()
 
                     if (trimmedQuery.isBlank()) {
                         return@collectLatest
@@ -59,16 +69,31 @@ class RecipesViewModel @Inject constructor(
                     delay(350.milliseconds)
 
                     _uiState.update { state ->
-                        state.copy(isLoading = true, error = null)
+                        if (
+                            state.query == pairOfState.first &&
+                            state.retryCount == pairOfState.second
+                        ) {
+                            state.copy(resultState = RecipesResultState.Loading)
+                        } else
+                            state
                     }
 
                     try {
                         val recipes = repository.searchRecipes(trimmedQuery)
 
                         _uiState.update { state ->
-                            if (state.query == query)
-                                state.copy(recipes = recipes, hasSearched = true)
-                            else
+                            if (
+                                state.query == pairOfState.first &&
+                                state.retryCount == pairOfState.second
+                            ) {
+                                state.copy(resultState =
+                                    if (recipes.isEmpty()) {
+                                        RecipesResultState.Empty
+                                    } else {
+                                        RecipesResultState.Success(recipes)
+                                    }
+                                )
+                            } else
                                 state
                         }
 
@@ -76,15 +101,12 @@ class RecipesViewModel @Inject constructor(
                         throw e
                     } catch (e: Exception) {
                         _uiState.update { state ->
-                            if (state.query == query)
-                                state.copy(error = e.message ?: "Не вдалося завантажити рецепти")
-                            else
-                                state
-                        }
-                    } finally {
-                        _uiState.update { state ->
-                            if (state.query == query)
-                                state.copy(isLoading = false)
+                            if (
+                                state.query == pairOfState.first &&
+                                state.retryCount == pairOfState.second
+                            ) {
+                                state.copy(resultState = RecipesResultState.Error(e.message ?: "Не вдалося завантажити рецепти"))
+                            }
                             else
                                 state
                         }

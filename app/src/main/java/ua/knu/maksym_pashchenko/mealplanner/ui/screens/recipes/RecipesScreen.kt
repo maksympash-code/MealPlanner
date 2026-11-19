@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ua.knu.maksym_pashchenko.mealplanner.ui.screens.recipes.components.RecipeCard
+import ua.knu.maksym_pashchenko.mealplanner.ui.screens.recipes.state.RecipesResultState
 
 @Composable
 fun RecipesScreen(
@@ -51,29 +52,32 @@ fun RecipesScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        when {
-            uiState.isLoading -> {
+        when (val result = uiState.resultState) {
+            RecipesResultState.Initial -> {
                 Box(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Try to find recipes"
+                    )
+                }
+            }
+
+            RecipesResultState.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .weight(1f),
                     contentAlignment = Alignment.Center,
                 ) {
                     CircularProgressIndicator()
                 }
             }
 
-            uiState.error != null ->  {
-                Box(
-                    modifier = Modifier.padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = uiState.error ?: "Unknown error",
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
-
-            uiState.recipes.isNotEmpty() -> {
+            is RecipesResultState.Success  -> {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
@@ -81,7 +85,7 @@ fun RecipesScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(
-                            items = uiState.recipes,
+                            items = result.recipes,
                             key = { recipe -> recipe.id }
                         ) { recipe ->
                             RecipeCard(
@@ -91,14 +95,46 @@ fun RecipesScreen(
                     }
                 }
 
-            uiState.hasSearched ->  {
+            RecipesResultState.Empty ->  {
                 Box(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .weight(1f),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Нічого не знайдено"
+                        text = "Nothing found"
                     )
+                }
+            }
+
+            is RecipesResultState.Error ->  {
+                Box(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = result.message,
+                            color = MaterialTheme.colorScheme.error
+                        )
+
+                        Button(
+                            onClick = {
+                                viewModel.retrySearch()
+                            }
+                        ) {
+                            Text(
+                                text = "Retry"
+                            )
+                        }
+                    }
+
                 }
             }
         }
