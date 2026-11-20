@@ -54,11 +54,8 @@ fun RecipesScreen(
 
         when (val result = uiState.resultState) {
             RecipesResultState.Initial -> {
-                Box(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
+                CenteredStateContent(
+                    modifier = Modifier.weight(1f)
                 ) {
                     Text(
                         text = "Try to find recipes"
@@ -67,11 +64,8 @@ fun RecipesScreen(
             }
 
             RecipesResultState.Loading -> {
-                Box(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .weight(1f),
-                    contentAlignment = Alignment.Center,
+                CenteredStateContent(
+                    modifier = Modifier.weight(1f)
                 ) {
                     CircularProgressIndicator()
                 }
@@ -80,8 +74,8 @@ fun RecipesScreen(
             is RecipesResultState.Success  -> {
                     LazyColumn(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
+                            .fillMaxWidth()
+                            .weight(1f),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(
@@ -96,11 +90,8 @@ fun RecipesScreen(
                 }
 
             RecipesResultState.Empty ->  {
-                Box(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
+                CenteredStateContent(
+                    modifier = Modifier.weight(1f)
                 ) {
                     Text(
                         text = "Nothing found"
@@ -109,11 +100,8 @@ fun RecipesScreen(
             }
 
             is RecipesResultState.Error ->  {
-                Box(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
+                CenteredStateContent(
+                    modifier = Modifier.weight(1f)
                 ) {
                     Column(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -134,9 +122,24 @@ fun RecipesScreen(
                             )
                         }
                     }
-
                 }
             }
         }
+    }
+}
+
+
+@Composable
+private fun CenteredStateContent(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        content()
     }
 }

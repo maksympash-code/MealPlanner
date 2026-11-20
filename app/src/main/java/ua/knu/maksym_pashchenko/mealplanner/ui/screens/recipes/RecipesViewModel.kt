@@ -69,10 +69,7 @@ class RecipesViewModel @Inject constructor(
                     delay(350.milliseconds)
 
                     _uiState.update { state ->
-                        if (
-                            state.query == pairOfState.first &&
-                            state.retryCount == pairOfState.second
-                        ) {
+                        if (isCurrentRequest(state, pairOfState)) {
                             state.copy(resultState = RecipesResultState.Loading)
                         } else
                             state
@@ -82,10 +79,7 @@ class RecipesViewModel @Inject constructor(
                         val recipes = repository.searchRecipes(trimmedQuery)
 
                         _uiState.update { state ->
-                            if (
-                                state.query == pairOfState.first &&
-                                state.retryCount == pairOfState.second
-                            ) {
+                            if (isCurrentRequest(state, pairOfState)) {
                                 state.copy(resultState =
                                     if (recipes.isEmpty()) {
                                         RecipesResultState.Empty
@@ -101,10 +95,7 @@ class RecipesViewModel @Inject constructor(
                         throw e
                     } catch (e: Exception) {
                         _uiState.update { state ->
-                            if (
-                                state.query == pairOfState.first &&
-                                state.retryCount == pairOfState.second
-                            ) {
+                            if (isCurrentRequest(state, pairOfState)) {
                                 state.copy(resultState = RecipesResultState.Error(e.message ?: "Не вдалося завантажити рецепти"))
                             }
                             else
@@ -113,6 +104,15 @@ class RecipesViewModel @Inject constructor(
                     }
                 }
         }
+    }
+
+
+    private fun isCurrentRequest(
+        state: RecipesUiState,
+        request: Pair<String, Int>
+    ) : Boolean {
+        return state.query == request.first
+                && state.retryCount == request.second
     }
 
     init {
