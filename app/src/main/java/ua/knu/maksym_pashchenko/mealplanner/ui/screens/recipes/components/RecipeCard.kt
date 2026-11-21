@@ -19,10 +19,12 @@ import ua.knu.maksym_pashchenko.mealplanner.domain.model.Recipe
 @Composable
 fun RecipeCard(
     recipe: Recipe,
+    onRecipeClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
+        onClick = { onRecipeClick(recipe.id) }
     ) {
         Column{
             AsyncImage(

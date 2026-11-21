@@ -27,6 +27,7 @@ import ua.knu.maksym_pashchenko.mealplanner.ui.screens.recipes.state.RecipesResu
 
 @Composable
 fun RecipesScreen(
+    onRecipeClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val viewModel = hiltViewModel<RecipesViewModel>()
@@ -83,7 +84,8 @@ fun RecipesScreen(
                             key = { recipe -> recipe.id }
                         ) { recipe ->
                             RecipeCard(
-                                recipe = recipe
+                                recipe = recipe,
+                                onRecipeClick = onRecipeClick
                             )
                         }
                     }

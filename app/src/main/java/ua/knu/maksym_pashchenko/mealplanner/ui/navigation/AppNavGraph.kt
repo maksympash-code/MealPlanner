@@ -10,10 +10,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import ua.knu.maksym_pashchenko.mealplanner.ui.screens.details.RecipeDetailsScreen
 import ua.knu.maksym_pashchenko.mealplanner.ui.screens.favourites.FavoritesScreen
 import ua.knu.maksym_pashchenko.mealplanner.ui.screens.planner.PlanningScreen
 import ua.knu.maksym_pashchenko.mealplanner.ui.screens.recipes.RecipesScreen
@@ -76,7 +79,13 @@ fun AppNavGraph(
                 .consumeWindowInsets(innerPadding)
         ) {
             composable(route = Routes.RECIPES) {
-                RecipesScreen()
+                RecipesScreen(
+                    onRecipeClick = { recipeId ->
+                        navController.navigate(
+                            Routes.recipeDetails(recipeId = recipeId)
+                        )
+                    }
+                )
             }
             composable(route = Routes.FAVORITES) {
                 FavoritesScreen()
@@ -86,6 +95,16 @@ fun AppNavGraph(
             }
             composable(route = Routes.SHOPPING) {
                 ShoppingScreen()
+            }
+            composable(
+                route = Routes.RECIPE_DETAILS,
+                arguments = listOf(
+                    navArgument("recipeId") {
+                        type = NavType.StringType
+                    }
+                )
+            ) {
+                RecipeDetailsScreen()
             }
         }
     }

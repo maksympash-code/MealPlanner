@@ -5,4 +5,10 @@ object Routes {
     const val FAVORITES = "favorites"
     const val PLANNING = "planning"
     const val SHOPPING = "shopping"
+
+    const val RECIPE_DETAILS = "recipe/{recipeId}"
+
+    fun recipeDetails(recipeId: String): String {
+        return "recipe/$recipeId"
+    }
 }
