@@ -29,7 +29,7 @@ class RecipeDetailsViewModel @Inject constructor(
                 val recipe = repository.getRecipeById(recipeId)
 
                 if (recipe == null) {
-                    _uiState.value = RecipeDetailsUiState.Error(message = "Recipe ID is missing")
+                    _uiState.value = RecipeDetailsUiState.Error(message = "Recipe not found")
                     return@launch
                 }
 
@@ -46,7 +46,7 @@ class RecipeDetailsViewModel @Inject constructor(
         if (recipeId != null)
             loadRecipeDetails(recipeId)
         else {
-            _uiState.value = RecipeDetailsUiState.Error("Recipe not found")
+            _uiState.value = RecipeDetailsUiState.Error("Recipe ID is missing")
         }
     }
 }
