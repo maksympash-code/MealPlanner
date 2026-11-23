@@ -14,4 +14,7 @@ interface IngredientDao {
 
     @Query("SELECT * FROM ingredients WHERE recipeId = :recipeId")
     suspend fun getIngredientsByRecipeId(recipeId: String): List<IngredientEntity>
+
+    @Query("DELETE FROM ingredients WHERE recipeId = :recipeId")
+    suspend fun deleteIngredientsByRecipeId(recipeId: String)
 }
