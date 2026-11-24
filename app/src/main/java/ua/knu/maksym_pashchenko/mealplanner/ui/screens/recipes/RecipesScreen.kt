@@ -1,7 +1,6 @@
 package ua.knu.maksym_pashchenko.mealplanner.ui.screens.recipes
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,7 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import ua.knu.maksym_pashchenko.mealplanner.ui.screens.recipes.components.RecipeCard
+import ua.knu.maksym_pashchenko.mealplanner.ui.screens.components.CenteredStateContent
+import ua.knu.maksym_pashchenko.mealplanner.ui.screens.components.RecipeCard
 import ua.knu.maksym_pashchenko.mealplanner.ui.screens.recipes.state.RecipesResultState
 
 @Composable
@@ -72,26 +72,26 @@ fun RecipesScreen(
                 }
             }
 
-            is RecipesResultState.Success  -> {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        items(
-                            items = result.recipes,
-                            key = { recipe -> recipe.id }
-                        ) { recipe ->
-                            RecipeCard(
-                                recipe = recipe,
-                                onRecipeClick = onRecipeClick
-                            )
-                        }
+            is RecipesResultState.Success -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(
+                        items = result.recipes,
+                        key = { recipe -> recipe.id }
+                    ) { recipe ->
+                        RecipeCard(
+                            recipe = recipe,
+                            onRecipeClick = onRecipeClick
+                        )
                     }
                 }
+            }
 
-            RecipesResultState.Empty ->  {
+            RecipesResultState.Empty -> {
                 CenteredStateContent(
                     modifier = Modifier.weight(1f)
                 ) {
@@ -101,7 +101,7 @@ fun RecipesScreen(
                 }
             }
 
-            is RecipesResultState.Error ->  {
+            is RecipesResultState.Error -> {
                 CenteredStateContent(
                     modifier = Modifier.weight(1f)
                 ) {
@@ -127,21 +127,5 @@ fun RecipesScreen(
                 }
             }
         }
-    }
-}
-
-
-@Composable
-private fun CenteredStateContent(
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        content()
     }
 }

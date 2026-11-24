@@ -1,4 +1,4 @@
-package ua.knu.maksym_pashchenko.mealplanner.ui.screens.recipes.components
+package ua.knu.maksym_pashchenko.mealplanner.ui.screens.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth

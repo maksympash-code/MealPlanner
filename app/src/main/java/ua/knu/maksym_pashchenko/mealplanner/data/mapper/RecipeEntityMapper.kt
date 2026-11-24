@@ -32,10 +32,10 @@ fun RecipeWithIngredients.toDomain(): Recipe = Recipe(
     area = recipe.area,
     instructions = recipe.instructions,
     imageUrl = recipe.imageUrl,
-    ingredients = ingredients.map { ingedientEntity ->
+    ingredients = ingredients.map { ingredientEntity ->
         Ingredient(
-            name = ingedientEntity.ingredientName,
-            measure = ingedientEntity.ingredientMeasure
+            name = ingredientEntity.ingredientName,
+            measure = ingredientEntity.ingredientMeasure
         )
     }
 )

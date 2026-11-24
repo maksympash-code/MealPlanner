@@ -17,7 +17,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import ua.knu.maksym_pashchenko.mealplanner.ui.screens.details.RecipeDetailsScreen
-import ua.knu.maksym_pashchenko.mealplanner.ui.screens.favourites.FavoritesScreen
+import ua.knu.maksym_pashchenko.mealplanner.ui.screens.favorites.FavoritesScreen
 import ua.knu.maksym_pashchenko.mealplanner.ui.screens.planner.PlanningScreen
 import ua.knu.maksym_pashchenko.mealplanner.ui.screens.recipes.RecipesScreen
 import ua.knu.maksym_pashchenko.mealplanner.ui.screens.shopping.ShoppingScreen
@@ -88,7 +88,13 @@ fun AppNavGraph(
                 )
             }
             composable(route = Routes.FAVORITES) {
-                FavoritesScreen()
+                FavoritesScreen(
+                    onRecipeClick = { recipeId ->
+                        navController.navigate(
+                            Routes.recipeDetails(recipeId = recipeId)
+                        )
+                    }
+                )
             }
             composable(route = Routes.PLANNING) {
                 PlanningScreen()
