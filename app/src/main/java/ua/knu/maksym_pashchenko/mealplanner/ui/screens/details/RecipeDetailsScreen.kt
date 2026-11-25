@@ -10,7 +10,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +30,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import ua.knu.maksym_pashchenko.mealplanner.R
+import ua.knu.maksym_pashchenko.mealplanner.ui.screens.components.CenteredStateContent
 import ua.knu.maksym_pashchenko.mealplanner.ui.screens.details.state.RecipeDetailsUiState
 
 @Composable
@@ -33,6 +40,12 @@ fun RecipeDetailsScreen(
     val viewModel = hiltViewModel<RecipeDetailsViewModel>()
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val isFavorite by viewModel.isFavorite.collectAsStateWithLifecycle()
+
+    val isUpdatingFavorite by viewModel.isUpdatingFavorite.collectAsStateWithLifecycle()
+
+    val favoriteError by viewModel.favoriteError.collectAsStateWithLifecycle()
 
     Column(
         modifier = modifier
@@ -82,6 +95,32 @@ fun RecipeDetailsScreen(
                                 text = result.recipe.category ?: "Unknown category",
                                 style = MaterialTheme.typography.bodyMedium
                             )
+
+                            IconButton(
+                                onClick = { viewModel.toggleFavorite() },
+                                enabled = !isUpdatingFavorite && isFavorite != null,
+                            ) {
+                                Icon(
+                                    imageVector = when (isFavorite) {
+                                        true -> Icons.Default.Favorite
+                                        false -> Icons.Default.FavoriteBorder
+                                        else -> Icons.Default.Refresh
+                                    },
+                                    contentDescription = when (isFavorite) {
+                                            true -> "Remove from favorites"
+                                            false -> "Add to favorites"
+                                            else -> "Refreshing ..."
+                                        },
+                                )
+                            }
+
+                            favoriteError?.let { error ->
+                                Text(
+                                    text = error,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
                         }
                     }
 
@@ -129,19 +168,4 @@ fun RecipeDetailsScreen(
     }
 
 
-}
-
-@Composable
-private fun CenteredStateContent(
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        content()
-    }
 }

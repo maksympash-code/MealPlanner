@@ -3,6 +3,7 @@ package ua.knu.maksym_pashchenko.mealplanner
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.withTransaction
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.cancelAndJoin
@@ -16,6 +17,7 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -315,7 +317,96 @@ class FavoritesRepositoryImplTest {
         assertEquals(favoriteRecipe.name, favorites.single().name)
     }
 
-    // Shared test data
+
+    // TEST 8: Cascade deletion removes related records
+
+    @Test
+    fun deleteRecipe_cascadesToFavoritesAndIngredients() = runBlocking {
+        // Arrange
+        val recipe = testRecipe()
+
+        val anotherRecipe = recipe.copy(
+            id = "test-002",
+            name = "Another Chicken"
+        )
+
+        repository.addFavorite(recipe)
+        repository.addFavorite(anotherRecipe)
+
+        assertNotNull(
+            database.recipeDao().getRecipeById(recipe.id)
+        )
+
+        assertTrue(
+            repository.isFavorite(recipe.id).first()
+        )
+
+        assertEquals(
+            recipe.ingredients.size,
+            database.ingredientDao()
+                .getIngredientsByRecipeId(recipe.id)
+                .size
+        )
+
+        // Act
+        database.withTransaction {
+            database.openHelper.writableDatabase.execSQL(
+                "DELETE FROM recipes WHERE recipeId = ?",
+                arrayOf(recipe.id)
+            )
+        }
+
+        // Assert: Parent recipe was deleted
+        assertNull(
+            database.recipeDao().getRecipeById(recipe.id)
+        )
+
+        // Assert: Favorite was deleted automatically
+        assertFalse(
+            repository.isFavorite(recipe.id).first()
+        )
+
+        val favoriteEntities =
+            database.favoriteDao().getAllFavorites().first()
+
+        assertFalse(
+            favoriteEntities.any { it.recipeId == recipe.id }
+        )
+
+        // Assert: Ingredients were deleted automatically
+        assertTrue(
+            database.ingredientDao()
+                .getIngredientsByRecipeId(recipe.id)
+                .isEmpty()
+        )
+
+        // Assert: Unrelated recipe remains untouched
+        assertNotNull(
+            database.recipeDao().getRecipeById(anotherRecipe.id)
+        )
+
+        assertTrue(
+            repository.isFavorite(anotherRecipe.id).first()
+        )
+
+        assertEquals(
+            anotherRecipe.ingredients.size,
+            database.ingredientDao()
+                .getIngredientsByRecipeId(anotherRecipe.id)
+                .size
+        )
+
+        assertEquals(
+            1,
+            favoriteEntities.size
+        )
+
+        assertEquals(
+            anotherRecipe.id,
+            favoriteEntities.single().recipeId
+        )
+    }
+
 
     private fun testRecipe(): Recipe = Recipe(
         id = "test-001",
