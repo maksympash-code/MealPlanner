@@ -27,4 +27,7 @@ interface FavoriteDao {
     @Transaction
     @Query("SELECT recipes.* FROM recipes INNER JOIN favorites on recipes.recipeId = favorites.recipeId")
     fun observeFavoriteRecipes(): Flow<List<RecipeWithIngredients>>
+
+    @Query("SELECT EXISTS(SELECT 1 FROM favorites WHERE recipeId = :recipeId)")
+    suspend fun isFavoriteOnce(recipeId: String): Boolean
 }

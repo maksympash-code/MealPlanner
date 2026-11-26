@@ -6,10 +6,15 @@ import androidx.room.Room
 import androidx.room.withTransaction
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
@@ -405,6 +410,264 @@ class FavoritesRepositoryImplTest {
             anotherRecipe.id,
             favoriteEntities.single().recipeId
         )
+    }
+
+
+    // TEST 9: Adding recipe through toggleFavorite
+
+    @Test
+    fun toggleFavorite_notFavorite_addsRecipeAndIngredients() = runBlocking {
+            // Arrange
+            val recipe = testRecipe()
+
+            assertFalse(
+                repository.isFavorite(recipe.id).first()
+            )
+
+            assertNull(
+                database.recipeDao().getRecipeById(recipe.id)
+            )
+
+            // Act
+            repository.toggleFavorite(recipe)
+
+            // Assert
+            assertToggleState(
+                recipe = recipe,
+                expectedFavorite = true
+            )
+        }
+
+    // TEST 10: Removing recipe through toggleFavorite
+
+    @Test
+    fun toggleFavorite_alreadyFavorite_removesOnlyFavorite() =
+        runBlocking {
+            // Arrange
+            val recipe = testRecipe()
+
+            repository.addFavorite(recipe)
+
+            assertTrue(
+                repository.isFavorite(recipe.id).first()
+            )
+
+            // Act
+            repository.toggleFavorite(recipe)
+
+            // Assert
+            assertToggleState(
+                recipe = recipe,
+                expectedFavorite = false
+            )
+        }
+
+
+    // TEST 11: Two sequential toggles
+
+    @Test
+    fun toggleFavorite_calledTwice_restoresInitialState() =
+        runBlocking {
+            // Arrange
+            val recipe = testRecipe()
+
+            assertFalse(
+                repository.isFavorite(recipe.id).first()
+            )
+
+            // Act: First toggle
+            repository.toggleFavorite(recipe)
+
+            // Assert: Added
+            assertToggleState(
+                recipe = recipe,
+                expectedFavorite = true
+            )
+
+            // Act: Second toggle
+            repository.toggleFavorite(recipe)
+
+            // Assert: Removed
+            assertToggleState(
+                recipe = recipe,
+                expectedFavorite = false
+            )
+        }
+
+    // TEST 12: Even number of concurrent toggles
+
+    @Test
+    fun toggleFavorite_concurrentEvenToggles_restoresInitialState() =
+        runBlocking {
+            // Arrange
+            val recipe = testRecipe()
+
+            assertFalse(
+                repository.isFavorite(recipe.id).first()
+            )
+
+            // Act
+            withTimeout(15_000.milliseconds) {
+                performConcurrentToggles(
+                    recipe = recipe,
+                    count = 20
+                )
+            }
+
+            // Assert
+            assertToggleState(
+                recipe = recipe,
+                expectedFavorite = false
+            )
+        }
+
+    // TEST 13: Odd number of concurrent toggles
+
+    @Test
+    fun toggleFavorite_concurrentOddToggles_invertsInitialState() =
+        runBlocking {
+            // Arrange
+            val recipe = testRecipe()
+
+            assertFalse(
+                repository.isFavorite(recipe.id).first()
+            )
+
+            // Act
+            withTimeout(15_000.milliseconds) {
+                performConcurrentToggles(
+                    recipe = recipe,
+                    count = 21
+                )
+            }
+
+            // Assert
+            assertToggleState(
+                recipe = recipe,
+                expectedFavorite = true
+            )
+        }
+
+    // Shared assertion helper
+
+    private suspend fun assertToggleState(
+        recipe: Recipe,
+        expectedFavorite: Boolean
+    ) {
+        // Check reactive favorite status
+        assertEquals(
+            expectedFavorite,
+            repository.isFavorite(recipe.id).first()
+        )
+
+        // Check favorites table
+        val favoriteEntities =
+            database.favoriteDao().getAllFavorites().first()
+
+        assertEquals(
+            if (expectedFavorite) 1 else 0,
+            favoriteEntities.size
+        )
+
+        if (expectedFavorite) {
+            assertEquals(
+                recipe.id,
+                favoriteEntities.single().recipeId
+            )
+        }
+
+        // Check observable favorites list
+        val favorites =
+            repository.observeFavorites().first()
+
+        assertEquals(
+            if (expectedFavorite) 1 else 0,
+            favorites.size
+        )
+
+        if (expectedFavorite) {
+            assertEquals(
+                recipe.id,
+                favorites.single().id
+            )
+        }
+
+        // Check stored recipe
+        val savedRecipe =
+            database.recipeDao().getRecipeById(recipe.id)
+
+        assertNotNull(savedRecipe)
+
+        val actualRecipe = requireNotNull(savedRecipe)
+
+        assertEquals(recipe.id, actualRecipe.recipeId)
+        assertEquals(recipe.name, actualRecipe.recipeName)
+        assertEquals(recipe.category, actualRecipe.category)
+        assertEquals(recipe.area, actualRecipe.area)
+        assertEquals(recipe.imageUrl, actualRecipe.imageUrl)
+        assertEquals(recipe.instructions, actualRecipe.instructions)
+
+        // Check stored ingredients
+        val savedIngredients =
+            database.ingredientDao()
+                .getIngredientsByRecipeId(recipe.id)
+
+        assertEquals(
+            recipe.ingredients.size,
+            savedIngredients.size
+        )
+
+        val expectedIngredients = recipe.ingredients
+            .map { it.name to it.measure }
+            .groupingBy { it }
+            .eachCount()
+
+        val actualIngredients = savedIngredients
+            .map { it.ingredientName to it.ingredientMeasure }
+            .groupingBy { it }
+            .eachCount()
+
+        assertEquals(
+            expectedIngredients,
+            actualIngredients
+        )
+    }
+
+    // Shared concurrency helper
+
+    private suspend fun performConcurrentToggles(
+        recipe: Recipe,
+        count: Int
+    ) = coroutineScope {
+
+        val startSignal = CompletableDeferred<Unit>()
+
+        val readySignals = List(count) {
+            CompletableDeferred<Unit>()
+        }
+
+        repeat(count) { index ->
+
+            launch(Dispatchers.Default) {
+
+                // Signal that this coroutine is ready
+                readySignals[index].complete(Unit)
+
+                // Wait for the common start signal
+                startSignal.await()
+
+                // Execute atomic toggle
+                repository.toggleFavorite(recipe)
+            }
+        }
+
+        // Wait until all coroutines are ready
+        readySignals.forEach { signal ->
+            signal.await()
+        }
+
+        // Allow all coroutines to proceed
+        startSignal.complete(Unit)
     }
 
 

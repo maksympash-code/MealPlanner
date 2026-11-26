@@ -23,13 +23,7 @@ class FavoritesRepositoryImpl @Inject constructor(
 ) : FavoritesRepository {
     override suspend fun addFavorite(recipe: Recipe) {
         database.withTransaction {
-            recipeDao.insertRecipe(recipe.toEntity())
-
-            ingredientDao.deleteIngredientsByRecipeId(recipe.id)
-
-            ingredientDao.insertIngredients(recipe.toIngredientEntities())
-
-            favoriteDao.insertFavorite(FavoriteEntity(recipeId = recipe.id))
+            saveFavoriteInternal(recipe)
         }
     }
 
@@ -48,5 +42,27 @@ class FavoritesRepositoryImpl @Inject constructor(
 
     override fun isFavorite(recipeId: String): Flow<Boolean> {
         return favoriteDao.isFavorite(recipeId)
+    }
+
+    override suspend fun toggleFavorite(recipe: Recipe) {
+        database.withTransaction {
+            val status = favoriteDao.isFavoriteOnce(recipe.id)
+
+            if (status) {
+                removeFavorite(recipe.id)
+            } else {
+                saveFavoriteInternal(recipe)
+            }
+        }
+    }
+
+    private suspend fun saveFavoriteInternal(recipe: Recipe) {
+        recipeDao.insertRecipe(recipe.toEntity())
+
+        ingredientDao.deleteIngredientsByRecipeId(recipe.id)
+
+        ingredientDao.insertIngredients(recipe.toIngredientEntities())
+
+        favoriteDao.insertFavorite(FavoriteEntity(recipeId = recipe.id))
     }
 }

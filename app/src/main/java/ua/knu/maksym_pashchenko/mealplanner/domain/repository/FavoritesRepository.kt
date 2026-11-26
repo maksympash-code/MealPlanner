@@ -12,4 +12,6 @@ interface FavoritesRepository {
     fun observeFavorites(): Flow<List<Recipe>>
 
     fun isFavorite(recipeId: String): Flow<Boolean>
+
+    suspend fun toggleFavorite(recipe: Recipe)
 }
