@@ -11,6 +11,7 @@ import ua.knu.maksym_pashchenko.mealplanner.data.local.AppDatabase
 import ua.knu.maksym_pashchenko.mealplanner.data.local.dao.FavoriteDao
 import ua.knu.maksym_pashchenko.mealplanner.data.local.dao.IngredientDao
 import ua.knu.maksym_pashchenko.mealplanner.data.local.dao.RecipeDao
+import ua.knu.maksym_pashchenko.mealplanner.data.local.migration.MIGRATION_1_2
 import javax.inject.Singleton
 
 @Module
@@ -23,7 +24,9 @@ object DatabaseModule {
         return Room.databaseBuilder<AppDatabase>(
             context = context,
             name = "mealplanner_database"
-        ).build()
+        )
+            .addMigrations(MIGRATION_1_2)
+            .build()
     }
 
     @Provides
